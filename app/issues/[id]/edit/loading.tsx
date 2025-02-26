@@ -1,4 +1,4 @@
-import IssueFormSkeleton from "../_components/IssueFormSkeleton";
+import IssueFormSkeleton from "../../_components/IssueFormSkeleton";
 
 const Loading = () => {
   return <IssueFormSkeleton />;

@@ -9,12 +9,12 @@ type Props = {
 };
 
 const IssueDetailsPage = async ({ params }: Props) => {
-  const { id } = await Promise.resolve(params);
+  // const { id } = await Promise.resolve(params);
 
   // if(typeof id!== 'string') notFound()
 
   const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(id) },
+    where: { id: parseInt(params.id) },
   });
 
   if (!issue) notFound();
