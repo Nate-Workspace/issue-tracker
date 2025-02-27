@@ -6,6 +6,7 @@ import IssueEditButton from "./IssueEditButton";
 import DeleteIssueButton from "./DeleteIssueButton";
 import { getServerSession } from "next-auth";
 import authOptions from "@/app/auth/authOptions";
+import AssigneeSelect from "./AssigneeSelect";
 
 type Props = {
   params: { id: string };
@@ -13,8 +14,9 @@ type Props = {
 
 const IssueDetailsPage = async ({ params }: Props) => {
   // const { id } = await Promise.resolve(params);
-
   // if(typeof id!== 'string') notFound()
+
+  //Checking if there is a logged in user----------------
   const session = await getServerSession(authOptions);
 
   const issue = await prisma.issue.findUnique({
@@ -31,6 +33,7 @@ const IssueDetailsPage = async ({ params }: Props) => {
       {session && (
         <Box>
           <Flex direction="column" gap="4">
+            <AssigneeSelect/>
             <IssueEditButton issueId={issue.id} />
             <DeleteIssueButton issueId={issue.id} />
           </Flex>
