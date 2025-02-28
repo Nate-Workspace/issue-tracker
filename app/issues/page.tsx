@@ -2,9 +2,25 @@ import { prisma } from "@/prisma/client";
 import { Table } from "@radix-ui/themes";
 import { IssueStatusBadge,Link } from "../components";
 import IssueActions from "./IssueActions";
+import { Status } from "@prisma/client";
 
-const IssuesPage = async () => {
-  const issues= await prisma.issue.findMany() // issue is the table name
+interface Props{
+  searchParams : {status: Status}
+}
+
+const IssuesPage = async ({searchParams}: Props) => {
+  // Validating the query:
+  const awaitedSearchParams= await searchParams;
+
+  const statuses= Object.values(Status)           // Gives all the possible values of "Status"
+  console.log(statuses)
+  const status= statuses.includes(awaitedSearchParams.status) ? awaitedSearchParams.status : undefined;
+  // Getting the status query
+  const issues= await prisma.issue.findMany({
+    where:{
+      status  // or we can say status: status        // If we send undefined to prisma, it will not use that status as part of filtering
+    }
+  }) // issue is the table name
   return (
     <div>
       <IssueActions/>

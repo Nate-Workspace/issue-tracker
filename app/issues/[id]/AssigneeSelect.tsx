@@ -1,11 +1,10 @@
 "use client";
 
+import { Skeleton } from "@/app/components";
 import { Issue, User } from "@prisma/client";
 import { Select } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { Skeleton } from "@/app/components";
 import toast, { Toaster } from "react-hot-toast";
 
 const AssigneeSelect = ({ issue }: { issue: Issue }) => {
@@ -23,18 +22,21 @@ const AssigneeSelect = ({ issue }: { issue: Issue }) => {
 
   if (isLoading) return <Skeleton />;
   if (error) return null;
+  
+  //onValue change--------
+  const valueChange=(userID:string) => {
+    axios.patch(`/api/issues/${issue.id}`, {
+      assignedToUserId: userID === "unassigned" ? null : userID,
+    }).catch(()=>{
+      toast.error("Couldn't make the change")
+    });
+  }
 
   return (
     <>
       <Select.Root
         defaultValue={issue.assignedToUserId || "unassigned"}
-        onValueChange={(userID) => {
-          axios.patch(`/api/issues/${issue.id}`, {
-            assignedToUserId: userID === "unassigned" ? null : userID,
-          }).catch(()=>{
-            toast.error("Couldn't make the change")
-          });
-        }}
+        onValueChange={valueChange}
       >
         <Select.Trigger placeholder="Assign..." />
         <Select.Content>
