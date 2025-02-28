@@ -24,7 +24,7 @@ const AssigneeSelect = ({ issue }: { issue: Issue }) => {
   if (error) return null;
   
   //onValue change--------
-  const valueChange=(userID:string) => {
+  const valueChange=(userID:string) => {      // The argument passed is chosen based on the VALUE PROP inside the Item
     axios.patch(`/api/issues/${issue.id}`, {
       assignedToUserId: userID === "unassigned" ? null : userID,
     }).catch(()=>{

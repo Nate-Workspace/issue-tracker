@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 
 
-const statuses: {label: string, value?: Status}[]=[
+const statuses: {label: string, value?: Status}[]=[      //The type shows "An array of objects"
     {label: "All"},
     {label:'Open', value: 'OPEN'},
     {label: "In Progress", value:"IN_PROGRESS"},
@@ -20,13 +20,13 @@ const IssueStatusFilter = () => {
 
   return (
     <Select.Root onValueChange={(status)=>{
-        const query= status=== "All" ? "" : `?status=${status}`  ;
+        const query= status=== "ALL" ? "" : `?status=${status}`  ;
         router.push(`/issues${query}`)
     }}>
         <Select.Trigger placeholder='Filter by status...' />
         <Select.Content>
             {statuses.map((status, index)=> (
-                <Select.Item key={index} value={status.value || "All"}>
+                <Select.Item key={index} value={status.value || "ALL"}>
                     {status.label}
                 </Select.Item>
             ))}
