@@ -5,15 +5,20 @@ import IssueActions from "./IssueActions";
 import { Issue, Status } from "@prisma/client";
 import NextLink from "next/link";
 import { ArrowUpIcon } from "@radix-ui/react-icons";
+import Pagination from "../components/Pagination";
 
 interface Props {
-  searchParams: { status: Status; orderBy: keyof Issue };
+  searchParams: {
+    status: Status;
+    orderBy: keyof Issue;
+    page: string; // All search params are of type string
+  };
 }
 
 const IssuesPage = async ({ searchParams }: Props) => {
   // Validating the query:
   const awaitedSearchParams = await searchParams;
-  console.log(awaitedSearchParams)
+  console.log(awaitedSearchParams);
 
   // Creating a columns array to map for the headers of the table
   const columns: { label: string; value: keyof Issue; className?: string }[] = [
@@ -28,9 +33,14 @@ const IssuesPage = async ({ searchParams }: Props) => {
 
   //Checking if status and orderBy are valid or not----------
   const statuses = Object.values(Status); // Gives all the possible values of "Status"
+
   const status = statuses.includes(awaitedSearchParams.status)
     ? awaitedSearchParams.status
     : undefined; //Undefined means: "no filtering using this parameter"
+  
+  const where= { status }   // or we can say status: status 
+  
+
   const orderBy = columns.some(
     (column) => column.value === awaitedSearchParams.orderBy
   )
@@ -38,13 +48,20 @@ const IssuesPage = async ({ searchParams }: Props) => {
     : undefined;
 
 
-  // Getting the status query
+    const page= parseInt(awaitedSearchParams.page) || 1;
+    const pageSize= 10;
+  // Fetching the issues and getting the status query---------
   const issues = await prisma.issue.findMany({
-    where: {
-      status, // or we can say status: status        // If we send undefined to prisma, it will not use that status as part of filtering
-    },
-    orderBy, // Sorting functionality by orderBy
-  }); // issue is the table name
+    where,   // where: where,
+    orderBy,
+    skip: (page-1) * pageSize,
+    take: pageSize,
+  });
+
+  //Getting the number of issues---
+  const issueCount = await prisma.issue.count({
+    where,
+  })
 
   return (
     <div>
@@ -90,6 +107,7 @@ const IssuesPage = async ({ searchParams }: Props) => {
           ))}
         </Table.Body>
       </Table.Root>
+      <Pagination currentPage={page} pageSize={pageSize} itemCount={issueCount}/>
     </div>
   );
 };
