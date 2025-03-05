@@ -13,6 +13,7 @@ interface Props {
 const IssuesPage = async ({ searchParams }: Props) => {
   // Validating the query:
   const awaitedSearchParams = await searchParams;
+  console.log(awaitedSearchParams)
 
   // Creating a columns array to map for the headers of the table
   const columns: { label: string; value: keyof Issue; className?: string }[] = [
