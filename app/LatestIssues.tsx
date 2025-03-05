@@ -25,10 +25,10 @@ const LatestIssues = async () => {
             <Table.Cell>
                 <Flex justify='between'>
                 <Flex direction='column' align='start' gap='2'>   {/* By default align is set to stretch for column */}
-                    <Link href={`/issue/${issue.id}`}>{issue.title}</Link>
+                    <Link href={`/issues/${issue.id}`}>{issue.title}</Link>
                     <IssueStatusBadge status={issue.status}/>
                 </Flex>
-                {issue.assignedToUser && <Avatar src={issue.assignedToUser.image!} fallback="?" size="2"  radius="full"/>}
+                {issue.assignedToUser ? <Avatar src={issue.assignedToUser.image!} fallback="?" size="2"  radius="full"/> : "Unassigned"}
                 </Flex>
             </Table.Cell>
           </Table.Row>
