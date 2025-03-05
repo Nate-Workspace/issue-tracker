@@ -29,7 +29,7 @@ const IssuesPage = async ({ searchParams }: Props) => {
 
   const orderBy = columnNames.includes(searchParams.orderBy)
     ? { [awaitedSearchParams.orderBy]: "asc" }
-    : undefined;
+    : undefined;    // If undefined, prisma won't consider it for filtering
 
 
     const page= parseInt(awaitedSearchParams.page) || 1;
