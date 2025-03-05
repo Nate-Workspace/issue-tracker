@@ -9,17 +9,21 @@ import authOptions from "@/app/auth/authOptions";
 import AssigneeSelect from "./AssigneeSelect";
 import { Metadata } from "next";
 import { title } from "process";
+import { cache } from "react";
 
 type Props = {
   params: { id: string };
 };
+
+// const fetchIssue= cache((issueId: number)=> prisma.issue.findUnique({where: {id: issueId}}))
 
 const IssueDetailsPage = async ({ params }: Props) => {
   // const { id } = await Promise.resolve(params);
   // if(typeof id!== 'string') notFound()
 
   //Checking if there is a logged in user----------------
-  const session = await getServerSession(authOptions);
+  // const session = await fetchIssue(parseInt(params.id));
+  const session = await prisma.issue.findUnique({where: {id: parseInt(params.id)}});
 
   const issue = await prisma.issue.findUnique({
     where: { id: parseInt(params.id) },
@@ -47,7 +51,9 @@ const IssueDetailsPage = async ({ params }: Props) => {
 
 // generating a dynamic metadata-------
 export async function generateMetadata({params}: Props){
-  const issue= await prisma.issue.findUnique({where: {id: parseInt(params.id)}})
+  // const issue= await fetchIssue(parseInt(params.id))
+  
+  const issue = await prisma.issue.findUnique({where: {id: parseInt(params.id)}});
 
   return {
     title: issue?.title,
