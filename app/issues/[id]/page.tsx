@@ -8,25 +8,21 @@ import { getServerSession } from "next-auth";
 import authOptions from "@/app/auth/authOptions";
 import AssigneeSelect from "./AssigneeSelect";
 import { Metadata } from "next";
-import { title } from "process";
 import { cache } from "react";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
-// const fetchIssue= cache((issueId: number)=> prisma.issue.findUnique({where: {id: issueId}}))
+const IssueDetailsPage: React.FC<Props> = async ({ params }) => {
+  // Await the params to get the actual values
+  const { id } = await params;
 
-const IssueDetailsPage = async ({ params }: Props) => {
-  // const { id } = await Promise.resolve(params);
-  // if(typeof id!== 'string') notFound()
-
-  //Checking if there is a logged in user----------------
-  // const session = await fetchIssue(parseInt(params.id));
-  const session = await prisma.issue.findUnique({where: {id: parseInt(params.id)}});
+  // Checking if there is a logged-in user
+  const session = await getServerSession(authOptions);
 
   const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: parseInt(id, 10) },
   });
 
   if (!issue) notFound();
@@ -39,7 +35,7 @@ const IssueDetailsPage = async ({ params }: Props) => {
       {session && (
         <Box>
           <Flex direction="column" gap="4">
-            <AssigneeSelect issue={issue}/>
+            <AssigneeSelect issue={issue} />
             <IssueEditButton issueId={issue.id} />
             <DeleteIssueButton issueId={issue.id} />
           </Flex>
@@ -49,16 +45,19 @@ const IssueDetailsPage = async ({ params }: Props) => {
   );
 };
 
-// generating a dynamic metadata-------
-export async function generateMetadata({params}: Props){
-  // const issue= await fetchIssue(parseInt(params.id))
-  
-  const issue = await prisma.issue.findUnique({where: {id: parseInt(params.id)}});
+// Generating dynamic metadata
+export async function generateMetadata({ params }: Props) {
+  // Await the params to get the actual values
+  const { id } = await params;
+
+  const issue = await prisma.issue.findUnique({
+    where: { id: parseInt(id, 10) },
+  });
 
   return {
     title: issue?.title,
-    description: 'Details of issue ' + issue?.id
-  }
+    description: `Details of issue ${issue?.id}`,
+  };
 }
 
 export default IssueDetailsPage;
