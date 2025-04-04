@@ -6,62 +6,60 @@ import IssueTable, { columnNames, IssueQuery } from "./IssueTable";
 import { Flex } from "@radix-ui/themes";
 import { Metadata } from "next";
 
+// Update Props to include searchParams as a Promise
 interface Props {
-  searchParams: IssueQuery;
+  searchParams: Promise<IssueQuery>;
 }
 
-const IssuesPage = async ({ searchParams }: Props) => {
-  // Validating the query:
+const IssuesPage: React.FC<Props> = async ({ searchParams }) => {
+  // Await the searchParams to get the actual values
   const awaitedSearchParams = await searchParams;
-  console.log(awaitedSearchParams);
+
+  // Validating the query:
+  const { status, orderBy, page } = awaitedSearchParams;
 
   // Creating a columns array to map for the headers of the table
-  
+  // (Assuming columnNames is already defined in IssueTable)
 
-  //Checking if status and orderBy are valid or not----------
+  // Checking if status and orderBy are valid or not----------
   const statuses = Object.values(Status); // Gives all the possible values of "Status"
 
-  const status = statuses.includes(awaitedSearchParams.status)
-    ? awaitedSearchParams.status
-    : undefined; //Undefined means: "no filtering using this parameter"
+  const validStatus = statuses.includes(status) ? status : undefined; // Undefined means: "no filtering using this parameter"
   
-  const where= { status }   // or we can say status: status 
-  
+  const where = validStatus ? { status: validStatus } : {};
 
-  const orderBy = columnNames.includes(searchParams.orderBy)
-    ? { [awaitedSearchParams.orderBy]: "asc" }
-    : undefined;    // If undefined, prisma won't consider it for filtering
+  const validOrderBy = columnNames.includes(orderBy) ? { [orderBy]: "asc" } : undefined; // If undefined, prisma won't consider it for filtering
 
+  const validPage = parseInt(page, 10) || 1;
+  const pageSize = 10;
 
-    const page= parseInt(awaitedSearchParams.page) || 1;
-    const pageSize= 10;
   // Fetching the issues and getting the status query---------
   const issues = await prisma.issue.findMany({
-    where,   // where: where,
-    orderBy,
-    skip: (page-1) * pageSize,
+    where,
+    orderBy: validOrderBy,
+    skip: (validPage - 1) * pageSize,
     take: pageSize,
   });
 
-  //Getting the number of issues---
+  // Getting the number of issues---
   const issueCount = await prisma.issue.count({
     where,
-  })
+  });
 
   return (
-    <Flex direction="column" gap='5'>
+    <Flex direction="column" gap="5">
       <IssueActions />
-      <IssueTable searchParams={searchParams} issues={issues}/>
-      <Pagination currentPage={page} pageSize={pageSize} itemCount={issueCount}/>
+      <IssueTable searchParams={awaitedSearchParams} issues={issues} />
+      <Pagination currentPage={validPage} pageSize={pageSize} itemCount={issueCount} />
     </Flex>
   );
 };
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata={
-  title: 'Issue Tracker - Issue List',
-  description: "Viewing all the lists of issues in the site supported with sorting, pagination and filtering "
-}
+export const metadata: Metadata = {
+  title: "Issue Tracker - Issue List",
+  description: "Viewing all the lists of issues in the site supported with sorting, pagination, and filtering",
+};
 
 export default IssuesPage;

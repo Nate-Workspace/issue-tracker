@@ -1,5 +1,5 @@
 import { ArrowUpIcon } from '@radix-ui/react-icons'
-import { Table } from '@radix-ui/themes'
+import { Table, Text } from '@radix-ui/themes'
 import NextLink from "next/link";          // it's better if you import it as nextlink
 import React from 'react'
 import { IssueStatusBadge, Link } from '../components'
@@ -20,6 +20,8 @@ const IssueTable = async ({searchParams, issues}: Props) => {
     
 
       const awaitedParams= await searchParams;
+
+      if(issues.length === 0) return <p className='mt-2 m-auto'> No issues available</p>
   return (
     <Table.Root variant="surface">
         <Table.Header>

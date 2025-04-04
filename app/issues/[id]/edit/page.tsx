@@ -1,15 +1,23 @@
 import { prisma } from '@/prisma/client';
 import { notFound } from 'next/navigation';
-import IssueEditClient from './IssueEditClient'; // ✅ Import the new client component
+import IssueEditClient from './IssueEditClient';
 
-const IssueEditPage = async ({ params }: { params: { id: string } }) => {
+// Define the correct type for the page props
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+const IssueEditPage: React.FC<PageProps> = async ({ params }) => {
+  // Await the params to get the actual values
+  const { id } = await params;
+
   const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(params.id) }
+    where: { id: parseInt(id, 10) } // Ensure id is parsed correctly
   });
 
   if (!issue) notFound();
 
-  return <IssueEditClient issue={issue} />; // ✅ Pass data to the client component
+  return <IssueEditClient issue={issue} />;
 };
 
 export default IssueEditPage;
